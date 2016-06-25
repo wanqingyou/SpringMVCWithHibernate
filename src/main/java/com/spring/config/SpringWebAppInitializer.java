@@ -14,21 +14,6 @@ import org.springframework.web.servlet.DispatcherServlet;
 @Order(1)
 public class SpringWebAppInitializer implements WebApplicationInitializer {
 
-	//	@Override
-	//	public void onStartup(ServletContext servletContext) throws ServletException {
-	//		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
-	//		appContext.register(ApplicationContextConfig.class);
-	//		//for spring MVC dispatch
-	//		ServletRegistration.Dynamic dispatcher = servletContext.addServlet("SpringDispatcher", new DispatcherServlet(appContext));
-	//		dispatcher.setLoadOnStartup(1);
-	//		dispatcher.addMapping("/");
-	//		//		//for REST service
-	//		//		ServletRegistration.Dynamic restDispatcher = servletContext.addServlet("SpringRestDispatcher", new SpringServlet());
-	//		//		restDispatcher.setLoadOnStartup(2);
-	//		//		restDispatcher.addMapping("/rest/");
-	//
-	//	}
-
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		registerContextLoaderListener(servletContext);

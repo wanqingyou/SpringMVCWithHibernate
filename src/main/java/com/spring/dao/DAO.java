@@ -27,6 +27,8 @@ public interface DAO {
 
 	public List<Orders> listOrdersByCustomer(int id);
 
+	public List<Orders> listOrdersByCustomer(int id, Date date);
+
 	public List<OrderItem> listOrderItemsByOrder(int id);
 
 	public void addProduct(Product product);

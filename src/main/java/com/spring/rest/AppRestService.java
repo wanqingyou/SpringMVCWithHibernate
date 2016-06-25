@@ -1,5 +1,8 @@
 package com.spring.rest;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -7,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -17,93 +19,93 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
-import com.spring.dao.DAO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.spring.model.Customers;
 import com.spring.model.OrderItem;
 import com.spring.model.Orders;
 import com.spring.model.Product;
+import com.spring.service.AppService;
 import com.spring.vo.ProductToBeItem;
 
 @Path("/")
+@Component
 public class AppRestService {
 
 	@Autowired
-	private DAO appDao;
+	private AppService appService;
+
+	ObjectMapper mapper = new ObjectMapper();
 
 	@GET
 	@Path("/getOrderDetails/{custName}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	public List<Orders> getOrderDetailsByCustomer(@PathParam(value = "custName") String custName) {
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String getOrderDetailsByCustomer(@PathParam(value = "custName") String custName) throws JsonProcessingException {
 		if (custName == null || custName.equals("")) {
 			throw new IllegalArgumentException("custName cannot be null.");
 		}
 		List<Orders> orders = new ArrayList<Orders>();
-		Customers c = appDao.getCustomerByName(custName);
+		Customers c = appService.getCustomerByName(custName);
 		if (c != null) {
 			int id = c.getCustomerID();
-			orders = appDao.listOrdersByCustomer(id);
-			for (Orders order : orders) {
-				List<OrderItem> items = appDao.listOrderItemsByOrder(order.getOrderID());
-				order.setOrderItem(new HashSet<OrderItem>(items));
-			}
+			orders = appService.listOrdersByCustomer(id);
 		}
-		return orders;
+
+		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		return mapper.writeValueAsString(orders);
 	}
 
 	@GET
-	@Path("/getTransactionsAtDate/{date}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Transactional
-	public List<Customers> getOrderDetailsByCustomer(@PathParam(value = "date") Date date) {
+	@Path("/getTransactionsOnDate/{date}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String getTransactionsOnDate(@PathParam(value = "date") String date) throws ParseException, JsonProcessingException {
 		if (date == null) {
 			throw new IllegalArgumentException("date cannot be null.");
 		}
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		Date parsedDate = df.parse(date);
 		List<Customers> customers = new ArrayList<Customers>();
-		customers = appDao.getCustomerByOrderDate(date);
+		customers = appService.getCustomerByOrderDate(parsedDate);
 		for (Customers c : customers) {
 			int id = c.getCustomerID();
-			List<Orders> orders = appDao.listOrdersByCustomer(id);
-			for (Orders order : orders) {
-				List<OrderItem> items = appDao.listOrderItemsByOrder(order.getOrderID());
-				order.setOrderItem(new HashSet<OrderItem>(items));
-			}
+			List<Orders> orders = appService.listOrdersByCustomer(id, parsedDate);
+
 			c.setOrder(new HashSet<Orders>(orders));
 		}
-		return customers;
+		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		return mapper.writeValueAsString(customers);
 	}
 
 	@POST
 	@Path("/updateProductPrice")
-	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
+	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Transactional
-	public Product updateProductPrice(@FormParam("name") String name, @FormParam("unitPrice") double unitPrice) {
-		if (name == null || name.equals("")) {
-			throw new IllegalArgumentException("name cannot be null.");
+	public String updateProductPrice(Product product) throws JsonProcessingException {
+		if (product == null) {
+			throw new IllegalArgumentException("product cannot be null.");
 		}
 
-		Product product = appDao.getProductByName(name);
-		if (product != null) {
-			product.setUnitPrice(unitPrice);
-			appDao.updateProduct(product);
+		Product p = appService.getProductByName(product.getName());
+		if (p != null) {
+			p.setUnitPrice(product.getUnitPrice());
+			appService.updateProduct(p, p.getProductId());
+			Product productTo = appService.getProductByName(p.getName());
+			mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+			return mapper.writeValueAsString(productTo);
 		}
 		else {
-			product = new Product();
-			product.setName(name);
-			product.setUnitPrice(unitPrice);
-			appDao.addProduct(product);
+			return String.format("{product : %s not found}", product.getName());
 		}
-		return appDao.getProductByName(name);
 	}
 
 	@PUT
 	@Path("/addNewOrdersForCustomer/{custName}")
-	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public String addNewOrdersForCustomer(@PathParam(value = "custName") String custName, List<ProductToBeItem> items) {
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public String addNewOrdersForCustomer(@PathParam(value = "custName") String custName, List<ProductToBeItem> items) throws JsonProcessingException {
 		if (custName == null || custName.equals("")) {
 			throw new IllegalArgumentException("custName cannot be null.");
 		}
@@ -111,9 +113,9 @@ public class AppRestService {
 			throw new IllegalArgumentException("items cannot be null.");
 		}
 
-		Customers c = appDao.getCustomerByName(custName);
+		Customers c = appService.getCustomerByName(custName);
 		if (c == null) {
-			return String.format("Customer %s not found.", custName);
+			throw new IllegalArgumentException("customer cannot be null.");
 		}
 		else {
 			Set<OrderItem> orderItems = new HashSet<OrderItem>();
@@ -121,9 +123,10 @@ public class AppRestService {
 			double total = 0;
 			for (ProductToBeItem p : items) {
 				OrderItem item = new OrderItem();
-				item.setProduct(appDao.getProductById((p.getProductId())));
+				Product product = appService.getProductByName(p.getName());
+				item.setProduct(product);
 				item.setQuantity(p.getQuantity());
-				double s = p.getUnitPrice() * p.getQuantity();
+				double s = product.getUnitPrice() * p.getQuantity();
 				total += s;
 				item.setAmount(s);
 				item.setOrder(order);
@@ -133,8 +136,11 @@ public class AppRestService {
 			order.setOrderDate(new Date());
 			order.setOrderItem(orderItems);
 			order.setAmount(total);
-			appDao.addOrder(order);
+			appService.addOrder(order);
 		}
-		return String.format("Order added for customer %s.", custName);
+		int id = c.getCustomerID();
+		c.setOrder(new HashSet<Orders>(appService.listOrdersByCustomer(id)));
+		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		return mapper.writeValueAsString(c);
 	}
 }

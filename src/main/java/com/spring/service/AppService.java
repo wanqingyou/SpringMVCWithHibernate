@@ -24,6 +24,8 @@ public interface AppService {
 
 	public List<Orders> listOrdersByCustomer(int id);
 
+	public List<Orders> listOrdersByCustomer(int id, Date date);
+
 	public List<OrderItem> listOrderItemsByOrderId(int id);
 
 	public List<Product> listProducts();
@@ -37,4 +39,8 @@ public interface AppService {
 	public void addOrder(Orders order);
 
 	public void addOrderItem(OrderItem order);
+
+	public Customers getCustomerByName(String name);
+
+	public Product getProductByName(String name);
 }

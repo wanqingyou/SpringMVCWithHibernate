@@ -11,9 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entity bean with JPA annotations
@@ -23,8 +20,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "Customers")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Customers {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +33,7 @@ public class Customers {
 	private String address;
 	@OneToMany(fetch = FetchType.LAZY, targetEntity = Orders.class)
 	@JoinColumn(name = "customer_ID", referencedColumnName = "customer_ID")
+	//@JsonIgnore
 	private Set<Orders> order;
 
 	public int getCustomerID() {

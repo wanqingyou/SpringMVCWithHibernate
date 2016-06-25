@@ -129,7 +129,7 @@ public class DAOImpl implements DAO {
 	@Override
 	public Product getProductByName(String name) {
 		Session session = this.sessionFactory.getCurrentSession();
-		List<Product> products = session.createQuery("from Product where name = :name").setParameter("name", name).list();
+		List<Product> products = session.createQuery("from Product where lower(name) = :name").setParameter("name", name).list();
 		if (!products.isEmpty()) {
 			return products.get(0);
 		}
@@ -148,5 +148,14 @@ public class DAOImpl implements DAO {
 		Session session = this.sessionFactory.getCurrentSession();
 		session.persist(order);
 		logger.info("orderItem saved successfully, order Details=" + order);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Orders> listOrdersByCustomer(int id, Date date) {
+		String query = "SELECT orders FROM Orders orders" + " WHERE orders.customer.customerID = :id AND orders.orderDate = :orderDate";
+		Session session = this.sessionFactory.getCurrentSession();
+		List<Orders> list = session.createQuery(query).setParameter("id", id).setParameter("orderDate", date).list();
+		return list;
 	}
 }

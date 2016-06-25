@@ -15,11 +15,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.hibernate.annotations.Cascade;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -30,8 +29,6 @@ import org.hibernate.annotations.Cascade;
  */
 @Entity
 @Table(name = "Orders")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Orders {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,8 +41,9 @@ public class Orders {
 	private double amount;
 	@ManyToOne()
 	@JoinColumn(name = "Customer_ID")
+	@JsonIgnore
 	private Customers customer;
-	@OneToMany(orphanRemoval = true, fetch = FetchType.LAZY)
+	@OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "order_id", referencedColumnName = "order_id")
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	private Set<OrderItem> orderItem;

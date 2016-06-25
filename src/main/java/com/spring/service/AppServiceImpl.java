@@ -102,4 +102,19 @@ public class AppServiceImpl implements AppService {
 		appDao.addOrderItem(order);
 	}
 
+	@Override
+	public Customers getCustomerByName(String name) {
+		return appDao.getCustomerByName(name);
+	}
+
+	@Override
+	public List<Orders> listOrdersByCustomer(int id, Date date) {
+		return appDao.listOrdersByCustomer(id, date);
+	}
+
+	@Override
+	public Product getProductByName(String name) {
+		return appDao.getProductByName(name);
+	}
+
 }

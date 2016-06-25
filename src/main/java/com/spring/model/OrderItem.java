@@ -10,9 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entity bean with JPA annotations
@@ -22,8 +21,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "OrderItem")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class OrderItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,9 +32,11 @@ public class OrderItem {
 	private double amount;
 	@OneToOne(fetch = FetchType.EAGER, targetEntity = Product.class)
 	@JoinColumn(name = "product_Id", referencedColumnName = "product_Id")
+	@JsonIgnore
 	private Product product;
 	@ManyToOne
 	@JoinColumn(name = "order_id")
+	@JsonIgnore
 	private Orders order;
 
 	public int getOrderItemID() {

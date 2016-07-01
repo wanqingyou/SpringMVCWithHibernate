@@ -1,34 +1,53 @@
-body, #mainWrapper {
-	height: 100%;
-	background-color:rgb(245, 245, 245);
+body {
+	font-family: helvetica, arial, verdana;
+	font-size: 16pt;
 }
 
-body, .form-control{
-	font-size:12px!important;
+input[type="submit"] {
+	background-color: black;
+	color: white;
+	border: none;
 }
 
-.floatRight{
-	float:right;
+table th {
+	background-color: black;
+	color: white;
+}
+
+table.results tr:nth-child(even) {
+	background: #EEE
+}
+
+table.results tr:nth-child(odd) {
+	background: #FFF
+}
+
+.form-control {
+	font-size: 12px !important;
+}
+
+.floatRight {
+	float: right;
 	margin-right: 18px;
 }
 
-.has-error{
-	color:red;
+.has-error {
+	color: red;
 }
 
 .generic-container {
-  position:fixed;
-  width:80%;
-  margin-left: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 20px;
-  background-color: #EAE7E7;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 0 30px black;
+	position: fixed;
+	width: 40%;
+	margin-left: 20px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding: 20px;
+	background-color: #EAE7E7;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	box-shadow: 0 0 30px black;
 }
 
 .custom-width {
-    width: 80px !important;
+	width: 80px !important;
 }

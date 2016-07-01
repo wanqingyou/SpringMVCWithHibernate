@@ -6,66 +6,11 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link href="<c:url value="/resources/css/app.css" />" rel="stylesheet">
 <title>Product Management Form</title>
-<style type="text/css">
-body {
-	font-family: helvetica, arial, verdana;
-	font-size: 16pt;
-}
-
-input[type="submit"] {
-	background-color: black;
-	color: white;
-	border: none;
-}
-
-table th {
-	background-color: black;
-	color: white;
-}
-
-table.results tr:nth-child(even) {
-	background: #EEE
-}
-
-table.results tr:nth-child(odd) {
-	background: #FFF
-}
-
-.form-control {
-	font-size: 12px !important;
-}
-
-.floatRight {
-	float: right;
-	margin-right: 18px;
-}
-
-.has-error {
-	color: red;
-}
-
-.generic-container {
-	position: fixed;
-	width: 40%;
-	margin-left: 20px;
-	margin-top: 20px;
-	margin-bottom: 20px;
-	padding: 20px;
-	background-color: #EAE7E7;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	box-shadow: 0 0 30px black;
-}
-
-.custom-width {
-	width: 80px !important;
-}
-</style>
 </head>
 
 <body>
-
 	<div class="generic-container">
 		<c:choose>
 			<c:when test="${edit}">
